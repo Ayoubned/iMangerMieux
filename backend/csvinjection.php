@@ -3,7 +3,11 @@
 require_once('init_pdo.php');
 
 // CSV file path
+<<<<<<< Updated upstream
 $csvFile = 'sql\aliment.csv';
+=======
+$csvFile = 'sql/aliment.csv';
+>>>>>>> Stashed changes
 
 try {
     // Open the CSV file
