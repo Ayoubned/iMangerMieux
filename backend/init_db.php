@@ -14,7 +14,7 @@ $options = array(
 try {
     $pdo = new PDO($connectionString, _MYSQL_USER, _MYSQL_PASSWORD, $options);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $sql = file_get_contents('../sql/create_db.sql');
+    $sql = file_get_contents('sql/database.sql');
     $pdo->exec($sql);
     echo "Database created successfully!";
 } catch (PDOException $error) {
