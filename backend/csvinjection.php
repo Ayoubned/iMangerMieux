@@ -88,7 +88,7 @@ try {
         // Close the CSV file
         fclose($handle);
 
-        echo "CSV data successfully inserted into the database.";
+        echo "food data successfully inserted into the database.";
         
     } else {
         echo "Failed to open the CSV file.";
@@ -125,7 +125,7 @@ if (($handle = fopen($csvFile2, "r")) !== FALSE) {
     // Close the file
     fclose($handle);
 
-    echo "Data imported successfully!";
+    echo "Users imported successfully!";
 }
 
 } catch (Exception $e) {
