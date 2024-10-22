@@ -4,7 +4,7 @@ require_once('init_pdo.php');
 
 // CSV file path
 
-$csvFile = 'sql\aliment.csv';
+$csvFile = 'sql\aliments.csv';
 try {
     // Open the CSV file
     if (($handle = fopen($csvFile, 'r')) !== false) {
@@ -52,7 +52,10 @@ try {
                 }
                 $ratioValue = str_replace(',', '.', $ratioValue);
                 // Check for '-' which should be treated as 0
-                if ($ratioValue === '-') {
+                if ($ratioValue === 'traces') {
+                    $ratioValue = 0.005;
+                }
+                if ($ratioValue === '-' || $ratioValue === '') {
                     $ratioValue = 0;
                 }
             
