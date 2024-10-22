@@ -3,7 +3,7 @@
 require_once('init_pdo.php');
 
 // CSV file path
-$csvFile = 'C:\Users\you-y\Downloads\aliment.csv';
+$csvFile = 'sql\aliment.csv';
 
 try {
     // Open the CSV file
