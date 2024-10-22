@@ -5,6 +5,7 @@ require_once('init_pdo.php');
 // CSV file path
 
 $csvFile = 'sql\aliments.csv';
+$csvFile2 = 'sql\users.csv';
 try {
     // Open the CSV file
     if (($handle = fopen($csvFile, 'r')) !== false) {
@@ -92,6 +93,40 @@ try {
     } else {
         echo "Failed to open the CSV file.";
     }
+
+} catch (Exception $e) {
+    echo "Error: " . $e->getMessage();
+}
+try {
+
+// Open the CSV file for reading
+if (($handle = fopen($csvFile2, "r")) !== FALSE) {
+    // Skip the header row
+    fgetcsv($handle, 1000, ",");
+
+    // Prepare the SQL statement with placeholders
+    $sql = "INSERT INTO utilisateur (
+        id_age,id_sexe,id_ns,username,password
+    ) VALUES (
+        ?, ?, ?, ?, ?
+    )";
+
+    // Prepare the statement
+    $stmt = $pdo->prepare($sql);
+
+    // Loop through the CSV file and insert into the database
+    while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+        // Bind values from CSV to SQL query
+        $stmt->execute([
+            $data[0], $data[1], $data[2], $data[3], $data[4]
+        ]);
+    }
+
+    // Close the file
+    fclose($handle);
+
+    echo "Data imported successfully!";
+}
 
 } catch (Exception $e) {
     echo "Error: " . $e->getMessage();
