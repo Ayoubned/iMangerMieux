@@ -16,6 +16,19 @@ function create_aliment($db, $data)
     $stmt->execute([$data['NOM']]);
     return $db->lastInsertid();
 }
+function update_aliment($db, $ID_ALIMENT, $data)
+{
+    $sql = "UPDATE aliment SET NOM = ? WHERE ID_ALIMENT = ?";
+    $stmt = $db->prepare($sql);
+    return $stmt->execute([$data['NOM'], $ID_ALIMENT]);
+}
+
+function delete_aliment($db, $ID_ALIMENT)
+{
+    $sql = "DELETE FROM aliment WHERE ID_ALIMENT = ?";
+    $stmt = $db->prepare($sql);
+    return $stmt->execute([$ID_ALIMENT]);
+}
 
 
 function setHeaders()
@@ -59,7 +72,61 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         }
         break;
 
-   
+    case 'PUT':
+        if (isset($_GET['ID_ALIMENT'])) {
+            $stmt = $pdo->prepare("SELECT * FROM aliment WHERE ID_ALIMENT = ?");
+            $stmt->execute([$_GET['ID_ALIMENT']]);
+            $aliment = $stmt->fetch(PDO::FETCH_OBJ);
+
+            if (!$aliment) {
+                http_response_code(404);
+                echo json_encode(["error" => "aliment not found"]);
+                break;
+            }
+            $ID_ALIMENT = $_GET['ID_ALIMENT'];
+            $data = json_decode(file_get_contents('php://input'), true);
+            if (isset($data['NOM'])) {
+                if (update_aliment($pdo, $ID_ALIMENT, $data)) {
+                    http_response_code(200);
+                    echo json_encode(["ID_ALIMENT" => $ID_ALIMENT, "NOM" => $data['NOM']]);
+                } else {
+                    http_response_code(500);
+                    echo json_encode(["error" => "Failed to update aliment"]);
+                }
+            } else {
+                http_response_code(400);
+                echo json_encode(["error" => "InvalID_ALIMENT input data"]);
+            }
+        } else {
+            http_response_code(400);
+            echo json_encode(["error" => "aliment ID_ALIMENT is required"]);
+        }
+        break;
+
+    case 'DELETE':
+        if (isset($_GET['ID_ALIMENT'])) {
+            $stmt = $pdo->prepare("SELECT * FROM aliment WHERE ID_ALIMENT = ?");
+            $stmt->execute([$_GET['ID_ALIMENT']]);
+            $aliment = $stmt->fetch(PDO::FETCH_OBJ);
+
+            if (!$aliment) {
+                http_response_code(404);
+                echo json_encode(["error" => "aliment not found"]);
+            } else {
+                if (delete_aliment($pdo, $_GET['ID_ALIMENT'])) {
+                    http_response_code(200);
+                    echo json_encode(["message" => "aliment deleted"]);
+                } else {
+                    http_response_code(500);
+                    echo json_encode(["error" => "Failed to delete aliment"]);
+                }
+            }
+        } else {
+            http_response_code(400);
+            echo json_encode(["error" => "aliment ID_ALIMENT is required"]);
+        }
+        break;
+
 
     default:
         http_response_code(405);
