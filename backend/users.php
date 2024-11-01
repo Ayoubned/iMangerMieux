@@ -51,6 +51,28 @@ function setHeaders()
 }
 
 setHeaders();
+// Check for login request
+if ($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET['username'], $_GET['password'])) {
+    $username = $_GET['username'];
+    $password = $_GET['password'];
+
+    // Verify username and password
+    $stmt = $pdo->prepare("SELECT * FROM utilisateur WHERE USERNAME = ?");
+    $stmt->execute([$username]);
+    $user = $stmt->fetch(PDO::FETCH_OBJ);
+
+    if ($user && password_verify($password, $user->PASSWORD)) {
+        session_start();
+        $_SESSION['user_id'] = $user->ID_UTILISATEUR;
+        $_SESSION['username'] = $user->USERNAME;
+
+        echo json_encode(["message" => "Login successful"]);
+    } else {
+        http_response_code(401);
+        echo json_encode(["error" => "Invalid credentials"]);
+    }
+    exit;
+}
 
 // =================
 // Handle API Requests
@@ -73,23 +95,36 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         }
         break;
 
-    case 'POST':
-        $data = json_decode(file_get_contents('php://input'), true);
-        if (isset($data['ID_AGE'], $data['ID_SEXE'], $data['ID_NS'], $data['USERNAME'], $data['PASSWORD'])) {
-            $utilisateurID_UTILISATEUR = create_utilisateur($pdo, $data);
-            http_response_code(201);
-            echo json_encode([
-                "ID_UTILISATEUR" => $utilisateurID_UTILISATEUR,
-                "ID_AGE" => $data['ID_AGE'],
-                "ID_SEXE" => $data['ID_SEXE'],
-                "ID_NS" => $data['ID_NS'],
-                "USERNAME" => $data['USERNAME']
-            ]);
-        } else {
-            http_response_code(400);
-            echo json_encode(["error" => "Invalid input data"]);
-        }
-        break;
+        case 'POST':
+            $data = json_decode(file_get_contents('php://input'), true);
+            if (isset($data['ID_AGE'], $data['ID_SEXE'], $data['ID_NS'], $data['USERNAME'], $data['PASSWORD'])) {
+                try {
+                    // Attempt to create the new user
+                    $utilisateurID_UTILISATEUR = create_utilisateur($pdo, $data);
+                    http_response_code(201);
+                    echo json_encode([
+                        "ID_UTILISATEUR" => $utilisateurID_UTILISATEUR,
+                        "ID_AGE" => $data['ID_AGE'],
+                        "ID_SEXE" => $data['ID_SEXE'],
+                        "ID_NS" => $data['ID_NS'],
+                        "USERNAME" => $data['USERNAME']
+                    ]);
+                } catch (PDOException $e) {
+                    // Check if the error is due to duplicate username
+                    if ($e->getCode() == 23000) { // 23000 is the SQLSTATE code for integrity constraint violation
+                        http_response_code(409);
+                        echo json_encode(["error" => "Username already exists"]);
+                    } else {
+                        // Handle other potential database errors
+                        http_response_code(500);
+                        echo json_encode(["error" => "An unexpected error occurred"]);
+                    }
+                }
+            } else {
+                http_response_code(400);
+                echo json_encode(["error" => "Invalid input data"]);
+            }
+            break;
 
         case 'PUT':
             if (isset($_GET['ID_UTILISATEUR'])) {
