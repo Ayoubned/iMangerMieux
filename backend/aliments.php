@@ -3,7 +3,14 @@ require_once("init_pdo.php");
 
 function get_aliment($db)
 {
-    $sql = "SELECT * FROM aliment";
+    $sql = "SELECT 
+                aliment.ID_ALIMENT, 
+                aliment.NOM, 
+                JSON_OBJECTAGG(type_ratio.LAB, contient.VALEUR_RATIO) AS RATIOS 
+            FROM aliment
+            LEFT JOIN contient ON aliment.ID_ALIMENT = contient.ID_ALIMENT
+            LEFT JOIN type_ratio ON contient.ID_TR = type_ratio.ID_TR
+            GROUP BY aliment.ID_ALIMENT";
     $exe = $db->query($sql);
     $res = $exe->fetchAll(PDO::FETCH_OBJ);
     return $res;
@@ -14,8 +21,9 @@ function create_aliment($db, $data)
     $sql = "INSERT INTO aliment (NOM) VALUES (?)";
     $stmt = $db->prepare($sql);
     $stmt->execute([$data['NOM']]);
-    return $db->lastInsertid();
+    return $db->lastInsertId();
 }
+
 function update_aliment($db, $ID_ALIMENT, $data)
 {
     $sql = "UPDATE aliment SET NOM = ? WHERE ID_ALIMENT = ?";
@@ -29,7 +37,6 @@ function delete_aliment($db, $ID_ALIMENT)
     $stmt = $db->prepare($sql);
     return $stmt->execute([$ID_ALIMENT]);
 }
-
 
 function setHeaders()
 {
@@ -45,7 +52,15 @@ setHeaders();
 switch ($_SERVER["REQUEST_METHOD"]) {
     case 'GET':
         if (isset($_GET['ID_ALIMENT'])) {
-            $stmt = $pdo->prepare("SELECT * FROM aliment WHERE ID_ALIMENT = ?");
+            $stmt = $pdo->prepare("SELECT 
+                                       aliment.ID_ALIMENT, 
+                                       aliment.NOM, 
+                                       JSON_OBJECTAGG(type_ratio.LAB, contient.VALEUR_RATIO) AS RATIOS
+                                   FROM aliment
+                                   LEFT JOIN contient ON aliment.ID_ALIMENT = contient.ID_ALIMENT
+                                   LEFT JOIN type_ratio ON contient.ID_TR = type_ratio.ID_TR
+                                   WHERE aliment.ID_ALIMENT = ?
+                                   GROUP BY aliment.ID_ALIMENT");
             $stmt->execute([$_GET['ID_ALIMENT']]);
             $aliment = $stmt->fetch(PDO::FETCH_OBJ);
             if (json_encode($aliment) == 'false') {
@@ -68,7 +83,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             echo json_encode(["ID_ALIMENT" => $alimentID_ALIMENT, "NOM" => $data['NOM']]);
         } else {
             http_response_code(400);
-            echo json_encode(["error" => "InvalID_ALIMENT input data"]);
+            echo json_encode(["error" => "Invalid input data"]);
         }
         break;
 
@@ -95,7 +110,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
                 }
             } else {
                 http_response_code(400);
-                echo json_encode(["error" => "InvalID_ALIMENT input data"]);
+                echo json_encode(["error" => "Invalid input data"]);
             }
         } else {
             http_response_code(400);
@@ -127,10 +142,8 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         }
         break;
 
-
     default:
         http_response_code(405);
         echo json_encode(["error" => "Method not allowed"]);
-
 }
 ?>
