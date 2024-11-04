@@ -1,5 +1,8 @@
 <?php
 require_once("init_pdo.php");
+// Allow requests from your frontend origin (e.g., localhost)
+
+session_start();
 
 function get_utilisateur($db)
 {
@@ -48,6 +51,9 @@ function setHeaders()
 {
     header("Access-Control-Allow-Origin: *");
     header('Content-type: application/json; charset=utf-8');
+    header("Access-Control-Allow-Origin: http://localhost");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
 }
 
 setHeaders();
@@ -73,11 +79,54 @@ if ($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET['username'], $_GET['pass
     }
     exit;
 }
+// Handle login request
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_GET['action']) && $_GET['action'] === 'login') {
+    session_start();
+
+    // Fetch request data
+    $data = json_decode(file_get_contents('php://input'), true);
+    $username = $data['username'];
+    $password = $data['password'];
+
+    // Verify username and password
+    $stmt = $pdo->prepare("SELECT * FROM utilisateur WHERE USERNAME = ?");
+    $stmt->execute([$username]);
+    $user = $stmt->fetch(PDO::FETCH_OBJ);
+
+    if ($user && password_verify($password, $user->PASSWORD)) {
+        // Store user information in session
+        $_SESSION['user_id'] = $user->ID_UTILISATEUR;
+        $_SESSION['username'] = $user->USERNAME;
+        $_SESSION['age_group'] = $user->ID_AGE;
+        $_SESSION['gender'] = $user->ID_SEXE;
+        $_SESSION['activity_level'] = $user->ID_NS;
+
+        echo json_encode([
+            "message" => "Login successful",
+            "user" => [
+                "ID_UTILISATEUR" => $user->ID_UTILISATEUR,
+                "ID_SEXE" => $user->ID_SEXE,
+                "ID_NS" => $user->ID_NS,
+                "ID_AGE" => $user->ID_AGE,
+                "USERNAME" => $user->USERNAME
+            ]
+        ]);
+    } else {
+        http_response_code(401);
+        echo json_encode(["error" => "Invalid credentials"]);
+    }
+    exit;
+}
 
 // =================
 // Handle API Requests
 // =================
 switch ($_SERVER["REQUEST_METHOD"]) {
+    case 'OPTIONS':
+        // Respond to preflight request
+        http_response_code(200);
+        exit;
+
     case 'GET':
         if (isset($_GET['ID_UTILISATEUR'])) {
             $stmt = $pdo->prepare("SELECT * FROM utilisateur WHERE ID_UTILISATEUR = ?");
@@ -126,61 +175,54 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             }
             break;
 
-        case 'PUT':
-            if (isset($_GET['ID_UTILISATEUR'])) {
-                // Fetch the current utilisateur data
-                $stmt = $pdo->prepare("SELECT * FROM utilisateur WHERE ID_UTILISATEUR = ?");
-                $stmt->execute([$_GET['ID_UTILISATEUR']]);
-                $utilisateur = $stmt->fetch(PDO::FETCH_OBJ);
-        
-                if (!$utilisateur) {
-                    http_response_code(404);
-                    echo json_encode(["error" => "utilisateur not found"]);
-                    break;
-                }
-        
-                // Get the ID of the utilisateur to update
-                $ID_UTILISATEUR = $_GET['ID_UTILISATEUR'];
-        
-                // Decode the input data
-                $data = json_decode(file_get_contents('php://input'), true);
-        
-                // Update only the fields that are provided, keeping the current values for the rest
-                $ID_AGE = isset($data['ID_AGE']) ? $data['ID_AGE'] : $utilisateur->ID_AGE;
-                $ID_SEXE = isset($data['ID_SEXE']) ? $data['ID_SEXE'] : $utilisateur->ID_SEXE;
-                $ID_NS = isset($data['ID_NS']) ? $data['ID_NS'] : $utilisateur->ID_NS;
-                $USERNAME = isset($data['USERNAME']) ? $data['USERNAME'] : $utilisateur->USERNAME;
-        
-                // Handle password separately, since we don't want to hash the existing password again
-                if (isset($data['PASSWORD'])) {
-                    $PASSWORD = password_hash($data['PASSWORD'], PASSWORD_DEFAULT);
+            case 'PUT':
+                if (isset($_GET['ID_UTILISATEUR'])) {
+                    // Fetch the current utilisateur data
+                    $stmt = $pdo->prepare("SELECT * FROM utilisateur WHERE ID_UTILISATEUR = ?");
+                    $stmt->execute([$_GET['ID_UTILISATEUR']]);
+                    $utilisateur = $stmt->fetch(PDO::FETCH_OBJ);
+            
+                    if (!$utilisateur) {
+                        http_response_code(404);
+                        echo json_encode(["error" => "utilisateur not found"]);
+                        break;
+                    }
+            
+                    // Get the ID of the utilisateur to update
+                    $ID_UTILISATEUR = $_GET['ID_UTILISATEUR'];
+            
+                    // Decode the input data
+                    $data = json_decode(file_get_contents('php://input'), true);
+            
+                    // Populate fields, keeping current values if new ones are not provided
+                    $data['ID_AGE'] = $data['ID_AGE'] ?? $utilisateur->ID_AGE;
+                    $data['ID_SEXE'] = $data['ID_SEXE'] ?? $utilisateur->ID_SEXE;
+                    $data['ID_NS'] = $data['ID_NS'] ?? $utilisateur->ID_NS;
+                    $data['USERNAME'] = $data['USERNAME'] ?? $utilisateur->USERNAME;
+                    $data['PASSWORD'] = $data['PASSWORD'] ?? $utilisateur->PASSWORD;
+            
+                    // Call the update function
+                    $result = update_utilisateur($pdo, $ID_UTILISATEUR, $data);
+            
+                    if ($result) {
+                        http_response_code(200);
+                        echo json_encode([
+                            "ID_UTILISATEUR" => $ID_UTILISATEUR,
+                            "ID_AGE" => $data['ID_AGE'],
+                            "ID_SEXE" => $data['ID_SEXE'],
+                            "ID_NS" => $data['ID_NS'],
+                            "USERNAME" => $data['USERNAME']
+                        ]);
+                    } else {
+                        http_response_code(500);
+                        echo json_encode(["error" => "Failed to update utilisateur"]);
+                    }
                 } else {
-                    $PASSWORD = $utilisateur->PASSWORD; // Keep the existing hashed password
+                    http_response_code(400);
+                    echo json_encode(["error" => "utilisateur ID is required"]);
                 }
-        
-                // Prepare the SQL query to update the utilisateur
-                $sql = "UPDATE utilisateur SET ID_AGE = ?, ID_SEXE = ?, ID_NS = ?, USERNAME = ?, PASSWORD = ? WHERE ID_UTILISATEUR = ?";
-                $stmt = $pdo->prepare($sql);
-                $result = $stmt->execute([$ID_AGE, $ID_SEXE, $ID_NS, $USERNAME, $PASSWORD, $ID_UTILISATEUR]);
-        
-                if ($result) {
-                    http_response_code(200);
-                    echo json_encode([
-                        "ID_UTILISATEUR" => $ID_UTILISATEUR,
-                        "ID_AGE" => $ID_AGE,
-                        "ID_SEXE" => $ID_SEXE,
-                        "ID_NS" => $ID_NS,
-                        "USERNAME" => $USERNAME
-                    ]);
-                } else {
-                    http_response_code(500);
-                    echo json_encode(["error" => "Failed to update utilisateur"]);
-                }
-            } else {
-                http_response_code(400);
-                echo json_encode(["error" => "utilisateur ID is required"]);
-            }
-            break;
+                break;
+            
         
 
     case 'DELETE':
