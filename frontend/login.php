@@ -4,21 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/login.css">
 </head>
 <body>
 
-<form id="loginForm">
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" required>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <a class="navbar-brand mx-auto" href="index.php?page=dashboard">iMangerMieux</a>
+    </div>
+</nav>
 
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required>
-
-    <button type="submit">Login</button>
-</form>
-
-<script src="js/login.js"></script>
+<div class="container form-container">
+    <h2 class="text-center">Login to Your Account</h2>
+    <form id="loginForm" method="post" action="login_process.php">
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-login btn-block">Login</button>
+    </form>
+    <div class="signup-link">
+        <p>Don't have an account? <a href="signup.php">Signup here</a>.</p>
+    </div>
+</div>
 
 </body>
 </html>

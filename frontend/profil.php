@@ -12,7 +12,6 @@
 <body>
 
     <div class="container">
-        <?php include 'navbar.php'; ?>
 
         <h2 class="mt-4">User Profile</h2>
         <p class="lead">Please enter your profile information to personalize your food tracking experience.</p>

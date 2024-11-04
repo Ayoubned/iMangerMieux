@@ -10,10 +10,8 @@
     <script>
         const API_BASE_URL = "<?php echo API_BASE_URL; ?>";
     </script>
-</head>
-<body>
+
     <div class="container">
-        <?php include 'navbar.php'; ?>
         <h2 class="mt-4">Aliments List</h2>
         <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#addAlimentModal">Add New Aliment</button>
 

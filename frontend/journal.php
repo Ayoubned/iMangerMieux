@@ -12,7 +12,7 @@
 </head>
 <body>
     <div class="container">
-        <?php include 'navbar.php'; ?>
+
         <h2 class="mt-4">Food Journal</h2>
         <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#addEntryModal">Add New Entry</button>
 
