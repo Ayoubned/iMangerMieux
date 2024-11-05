@@ -2,7 +2,6 @@
 require_once("init_pdo.php");
 // Allow requests from your frontend origin (e.g., localhost)
 
-session_start();
 
 function get_utilisateur($db)
 {

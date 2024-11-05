@@ -17,47 +17,49 @@
 
 <div class="container form-container">
     <h2 class="text-center">Create Your Account</h2>
-    <form id="signupForm" method="post" action="signup_process.php">
+    <form id="signupForm">
         <div class="form-group">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" class="form-control" required>
-        </div>
-        <div class="form-group">
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" class="form-control" required>
-        </div>
-        <div class="form-group">
-            <label for="confirmPassword">Confirm Password:</label>
-            <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" required>
-        </div>
-        <div class="form-group">
-            <label for="age">Age:</label>
-            <input type="number" id="age" name="age" class="form-control" required>
-        </div>
-        <div class="form-group">
-            <label for="gender">Gender:</label>
-            <select id="gender" name="gender" class="form-control" required>
-                <option value="">Select</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="activityLevel">Activity Level:</label>
-            <select id="activityLevel" name="activityLevel" class="form-control" required>
-                <option value="">Select</option>
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-            </select>
-        </div>
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" class="form-control" required>
+</div>
+<div class="form-group">
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" class="form-control" required>
+</div>
+<div class="form-group">
+    <label for="confirmPassword">Confirm Password:</label>
+    <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" required>
+</div>
+<div class="form-group">
+    <label for="age">Age:</label>
+    <input type="number" id="age" name="age" class="form-control" required>
+</div>
+<div class="form-group">
+    <label for="gender">Gender:</label>
+    <select id="gender" name="gender" class="form-control" required>
+        <option value="">Select</option>
+        <option value="1">Male</option>
+        <option value="2">Female</option>
+        <option value="3">Other</option>
+    </select>
+</div>
+<div class="form-group">
+    <label for="activityLevel">Activity Level:</label>
+    <select id="activityLevel" name="activityLevel" class="form-control" required>
+        <option value="">Select</option>
+        <option value="1">Beginner</option>
+        <option value="2">Intermediate</option>
+        <option value="3">Advanced</option>
+        <option value="4">Expert</option>
+        <option value="5">Elite</option>
+    </select>
+</div>
         <button type="submit" class="btn btn-signup btn-block">Sign Up</button>
     </form>
     <div class="login-link">
         <p>Already have an account? <a href="login.php">Log in here</a>.</p>
     </div>
 </div>
-
+<script src="js/signup.js"></script>
 </body>
 </html>
