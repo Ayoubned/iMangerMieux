@@ -15,7 +15,7 @@ try {
 
         // Find the indexes of the relevant columns
         $alimentNameIndex = array_search('alim_nom_fr', $headers); // Find index for aliment name
-
+        // $typeAlimentIndex = array_search('type_aliment', $headers);
         // Array mapping CSV headers to type_ratio labels (as per database structure)
         $ratios = [
             'Energie (kj/100g)' => array_search('Energie, Règlement UE N° 1169/2011 (kJ/100 g)', $headers),
@@ -40,11 +40,17 @@ try {
         // Loop through each row of the CSV
         while (($data = fgetcsv($handle, 1000, ",")) !== false) {
             $alimentName = $data[$alimentNameIndex];
+            // $typeAliment = $data[$typeAlimentIndex];
             // Insert the aliment (if not exists) and get the aliment ID
             $stmt = $pdo->prepare("INSERT INTO aliment (NOM) VALUES (:nom) ON DUPLICATE KEY UPDATE ID_ALIMENT=LAST_INSERT_ID(ID_ALIMENT)");
             $stmt->execute(['nom' => $alimentName]);
             $alimentId = $pdo->lastInsertId();
-
+            //uncompleted type aliment insertion
+            // $typeAlimentStmt = $pdo->prepare("INSERT INTO type_aliment (id_aliment, type_aliment) VALUES (:id_aliment, :type_aliment)");
+            // $typeAlimentStmt->execute([
+            //     ':id_aliment' => $alimentId,
+            //     ':type_aliment' => $typeAliment]
+            // );
             // Loop through each ratio and insert it into `contient`
             foreach ($ratios as $ratioName => $columnIndex) {
                 $ratioValue = isset($data[$columnIndex]) ? trim($data[$columnIndex]) : null;
@@ -131,3 +137,4 @@ if (($handle = fopen($csvFile2, "r")) !== FALSE) {
 } catch (Exception $e) {
     echo "Error: " . $e->getMessage();
 }
+

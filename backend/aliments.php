@@ -1,6 +1,29 @@
 <?php
 require_once("init_pdo.php");
 
+function search_aliments($db, $name)
+{
+    $stmt = $db->prepare("SELECT NOM FROM aliment WHERE NOM LIKE ? LIMIT 10");
+    $stmt->execute(["%$name%"]);
+    return $stmt->fetchAll(PDO::FETCH_COLUMN);
+}
+
+function setHeaders()
+{
+    header("Access-Control-Allow-Origin: *");
+    header("Content-Type: application/json; charset=utf-8");
+}
+
+setHeaders();
+
+// Handle search requests for aliment suggestions
+if ($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["aliment_name"])) {
+    $aliment_name = $_GET["aliment_name"];
+    $suggestions = search_aliments($pdo, $aliment_name);
+    echo json_encode($suggestions);
+    exit;
+}
+
 function get_aliment($db)
 {
     $sql = "SELECT 
@@ -38,13 +61,6 @@ function delete_aliment($db, $ID_ALIMENT)
     return $stmt->execute([$ID_ALIMENT]);
 }
 
-function setHeaders()
-{
-    header("Access-Control-Allow-Origin: *");
-    header('Content-type: application/json; charset=utf-8');
-}
-
-setHeaders();
 
 // =================
 // Handle API Requests
