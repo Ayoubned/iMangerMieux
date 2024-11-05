@@ -1,13 +1,27 @@
 document.getElementById('signupForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
-    const age = document.getElementById('age').value;
-    const sex = document.getElementById('sex').value;
-    const activity = document.getElementById('activity').value;
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const age = parseInt(document.getElementById('age').value, 10);
+    const gender = document.getElementById('gender').value;
+    const activityLevel = document.getElementById('activityLevel').value;
 
-    // Determine age group based on age
+    // Password strength validation
+    const passwordRequirements = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!passwordRequirements.test(password)) {
+        alert("Password must be at least 8 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.");
+        return;
+    }
+
+    // Validate password confirmation
+    if (password !== confirmPassword) {
+        alert("Passwords do not match.");
+        return;
+    }
+
+    // Determine age category based on age
     let ID_AGE;
     if (age < 13) {
         alert("Users must be at least 13 years old.");
@@ -20,21 +34,26 @@ document.getElementById('signupForm').addEventListener('submit', async function(
         ID_AGE = 3;
     }
 
+    // Prepare data to send
+    const signupData = {
+        ID_AGE,
+        ID_SEXE: gender,
+        ID_NS: activityLevel,
+        USERNAME: username,
+        PASSWORD: password
+    };
+
+    // Send data to the server
     const response = await fetch('../backend/users.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            ID_AGE,
-            ID_SEXE: sex,
-            ID_NS: activity,
-            USERNAME: username,
-            PASSWORD: password
-        })
+        body: JSON.stringify(signupData)
     });
 
     const result = await response.json();
     if (response.ok) {
-        window.location.href = 'login.php'; // Redirect to login page
+        // Redirect to login page on successful signup
+        window.location.href = 'login.php';
     } else {
         alert(result.error);
     }

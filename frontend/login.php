@@ -17,7 +17,7 @@
 
 <div class="container form-container">
     <h2 class="text-center">Login to Your Account</h2>
-    <form id="loginForm" method="post" action="login_process.php">
+    <form id="loginForm">
         <div class="form-group">
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" class="form-control" required>
@@ -33,5 +33,6 @@
     </div>
 </div>
 
+<script src="js/login.js"></script>
 </body>
 </html>
