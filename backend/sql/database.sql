@@ -175,7 +175,7 @@ INSERT INTO `tranche_age` (`ID_AGE`, `LAB`) VALUES
 
 DROP TABLE IF EXISTS `type_aliment`;
 CREATE TABLE IF NOT EXISTS `type_aliment` (
-  `ID_TA` int NOT NULL,
+  `ID_TA` int NOT NULL AUTO_INCREMENT,
   `ID_ALIMENT` int DEFAULT NULL,
   `LAB` varchar(50) NOT NULL,
   PRIMARY KEY (`ID_TA`),
