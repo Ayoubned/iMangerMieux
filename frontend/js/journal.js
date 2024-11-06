@@ -12,11 +12,11 @@ $(document).ready(function() {
                 data.forEach(entry => {
                     $('#journalData').append(`
                         <tr>
-                            <td>${entry.date}</td>
-                            <td>${entry.aliment}</td>
-                            <td>${entry.quantity}</td>
-                            <td>${entry.calories}</td>
-                            <td>${entry.type}</td>
+                            <td>${entry.DATE}</td>
+                            <td>${entry.NOM}</td>
+                            <td>${entry.QUANTITE}</td>
+                            <td>${entry.VALEUR_RATIO}</td>
+                            <td>${entry.LAB}</td>
                             <td>
                                 <button class="btn btn-sm btn-warning edit-btn" data-id="${entry.id}">Edit</button>
                                 <button class="btn btn-sm btn-danger delete-btn" data-id="${entry.id}">Delete</button>
@@ -59,25 +59,35 @@ $(document).ready(function() {
                 method: 'GET',
                 data: { aliment_name: request.term },
                 success: function(data) {
-                    response(data);
+                    response($.map(data, function(item) {
+                        return {
+                            label: item.NOM,     
+                            value: item.ID_ALIMENT, 
+                            nom: item.NOM         
+                        };
+                    }));
                 },
                 error: function() {
                     alert("Failed to fetch aliment suggestions");
                 }
             });
         },
-        minLength: 2  // Start searching after 2 characters
+        minLength: 2, 
+        select: function(event, ui) {
+            $('#aliment').val(ui.item.value); 
+            $('#editAliment').val(ui.item.nom); 
+            return false; 
+        }
     });
 
     // Add Entry
     $('#addEntryForm').submit(function(event) {
         event.preventDefault();
         let entryData = {
-            date: $('#date').val(),
-            aliment: $('#aliment').val(),
-            quantity: $('#quantity').val(),
-            calories: $('#calories').val(),
-            type: $('#type').val()
+            DATE: $('#date').val(),
+            ID_ALIMENT: $('#aliment').val(),
+            QUANTITE: $('#quantity').val(),
+            ID_UTILISATEUR: sessionStorage.getItem('user_id'),
         };
 
         $.ajax({

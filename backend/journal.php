@@ -3,7 +3,21 @@ require_once("init_pdo.php");
 
 function get_journals($db)
 {
-    $sql = "SELECT * FROM journal";
+    $sql = "SELECT 
+    journal.ID_JOURNAL,
+    journal.DATE,
+    aliment.NOM ,
+    reference.QUANTITE ,
+    contient.VALEUR_RATIO ,
+    type_aliment.LAB 
+FROM 
+    journal
+JOIN reference ON journal.ID_JOURNAL = reference.ID_JOURNAL
+JOIN aliment ON reference.ID_ALIMENT = aliment.ID_ALIMENT
+JOIN contient ON aliment.ID_ALIMENT = contient.ID_ALIMENT
+JOIN type_aliment ON aliment.ID_ALIMENT = type_aliment.ID_ALIMENT
+WHERE 
+    contient.ID_TR = (SELECT ID_TR FROM type_ratio WHERE LAB = 'Energie (kj/100g)') ;";
     $exe = $db->query($sql);
     $res = $exe->fetchAll(PDO::FETCH_OBJ);
     return $res;
@@ -11,11 +25,15 @@ function get_journals($db)
 
 function create_journal($db, $data)
 {
-    $sql = "INSERT INTO journal (ID_UTILISATEUR, DATE) VALUES (?, ?)";
+    $sql = "INSERT INTO journal (ID_UTILISATEUR, DATE) VALUES (?, ?);
+INSERT INTO reference (ID_JOURNAL, ID_ALIMENT, QUANTITE) VALUES (LAST_INSERT_ID(), ?, ?);  
+";
     $stmt = $db->prepare($sql);
     $stmt->execute([
         $data['ID_UTILISATEUR'],
-        $data['DATE']
+        $data['DATE'],
+        $data['ID_ALIMENT'],
+        $data['QUANTITE']
     ]);
     return $db->lastInsertId();
 }
