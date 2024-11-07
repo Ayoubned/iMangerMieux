@@ -2,7 +2,11 @@
 include("config.php");
 $url=API_BASE_URL;
 require_once(__DIR__ . "/../backend/init_pdo.php");
-
+if (isset($_SESSION['user_id'])) {
+    // Redirect to dashboard if already logged in
+    header("Location: dashboard.php");
+    exit();
+}
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
