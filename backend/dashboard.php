@@ -24,7 +24,6 @@ function getDashboardData($db)
     // Define ratio type IDs for calories and proteins
     $caloriesRatioID = 7; 
     $proteinRatioID = 12;
-    $fruitVegServingsID = 13;
 
     // Query to get total and average calories for the past 7 days
     $caloriesQuery = "

@@ -5,7 +5,7 @@ $(document).ready(function() {
 
 function fetchDashboardData() {
     $.ajax({
-        url: API_BASE_URL + 'journal.php', 
+        url: API_BASE_URL + 'dashboard.php', 
         method: 'GET',
         dataType: 'json',
         success: function(data) {
