@@ -7,7 +7,6 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 include 'config.php';
-$url=API_BASE_URL;
 ?>
 
 <!DOCTYPE html>
@@ -20,6 +19,7 @@ $url=API_BASE_URL;
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
     <script>
         const API_BASE_URL = "<?php echo API_BASE_URL; ?>";
+        const userId = <?php echo json_encode($_SESSION['user_id']); ?>;
     </script>
 </head>
 <body>
@@ -111,9 +111,17 @@ $url=API_BASE_URL;
 </div>
 
 <!-- jQuery and Bootstrap Bundle (with Popper) -->
- 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<!-- DataTables JS -->
 <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
 <script src="js/journal.js"></script>
+<style>
+    .ui-autocomplete {
+        z-index: 1051; 
+    }
+</style>
 </body>
 </html>

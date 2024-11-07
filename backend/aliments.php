@@ -23,7 +23,13 @@ if (!isset($_SESSION['user_id'])) {
     echo json_encode(["error" => "User not authenticated"]);
     exit;
 }
-
+// Handle search requests for aliment suggestions
+if ($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["aliment_name"])) {
+    $aliment_name = $_GET["aliment_name"];
+    $suggestions = search_aliments($pdo, $aliment_name);
+    echo json_encode($suggestions);
+    exit;
+}
 function get_aliment($db)
 {
     $sql = "SELECT 
@@ -64,6 +70,7 @@ function delete_aliment($db, $ID_ALIMENT)
 // Handle API Requests
 switch ($_SERVER["REQUEST_METHOD"]) {
     case 'GET':
+        // Search by ID_ALIMENT if provided
         if (isset($_GET['ID_ALIMENT'])) {
             $stmt = $pdo->prepare("SELECT 
                                        aliment.ID_ALIMENT, 
@@ -82,7 +89,25 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             } else {
                 echo json_encode($aliment);
             }
-        } else {
+        }
+        // Search by NOM if provided
+        elseif (isset($_GET['NOM'])) {
+            $stmt = $pdo->prepare("SELECT 
+                                       aliment.ID_ALIMENT, 
+                                       aliment.NOM
+                                   FROM aliment
+                                   WHERE aliment.NOM LIKE ?");
+            $stmt->execute(['%' . $_GET['NOM'] . '%']);
+            $aliments = $stmt->fetchAll(PDO::FETCH_OBJ);
+            if (!$aliments) {
+                http_response_code(404);
+                echo json_encode(["error" => "No matching aliments found"]);
+            } else {
+                echo json_encode($aliments);
+            }
+        }
+        // If neither ID_ALIMENT nor NOM is provided, return all aliments
+        else {
             $result = get_aliment($pdo);
             echo json_encode($result);
         }
@@ -151,4 +176,5 @@ switch ($_SERVER["REQUEST_METHOD"]) {
         http_response_code(405);
         echo json_encode(["error" => "Method not allowed"]);
 }
+
 ?>

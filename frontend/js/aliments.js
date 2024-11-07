@@ -7,7 +7,30 @@ $(document).ready(function() {
         'Vitamine D (µg/100g)', 'Cholestérol (mg/100g)', 'Fibres alimentaires (g/100g)'
     ];
 
-    let alimentData = [];
+    let alimentData = []; // Variable to store data fetched from the API
+    // Function to populate the table with data based on the selected nutrient
+    function populateTable(nutrient) {
+        $('#alimentsData').empty(); // Clear current rows
+        alimentData.forEach(aliment => {
+            const parsedRatios = JSON.parse(aliment.RATIOS);
+            const nutrientValue = parsedRatios[nutrient] ? parseFloat(parsedRatios[nutrient]).toFixed(2) : 'N/A';
+            $('#alimentsData').append(`
+                <tr data-id="${aliment.ID_ALIMENT}">
+                    <td class="editable-name">${aliment.NOM}</td>
+                    <td>${parsedRatios["Energie (kcal/100g)"].toFixed(2)}</td>
+                    <td>${nutrient}</td>
+                    <td class="nutrient-value">${nutrientValue}</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning edit-btn" data-id="${aliment.ID_ALIMENT}">Edit</button>
+                    </td>
+                </tr>
+            `);
+        });
+        if ($.fn.DataTable.isDataTable('#alimentsTable')) {
+            $('#alimentsTable').DataTable().destroy();
+        }
+        $('#alimentsTable').DataTable();
+    }
 
     function fetchAliments() {
         $.ajax({
@@ -37,7 +60,39 @@ $(document).ready(function() {
             }
         });
     }
-
+ // Handle edit button click
+ $('#alimentsData').on('click', '.edit-btn', function() {
+    const row = $(this).closest('tr');
+    const id = $(this).data('id');
+    const currentName = row.find('.editable-name').text();
+    // Make name cell editable
+    row.find('.editable-name').html(`<input type="text" class="form-control edit-name" value="${currentName}" />`);
+    $(this).text('Save').removeClass('edit-btn btn-warning').addClass('save-btn btn-success');
+});
+// Handle save button click after editing
+$('#alimentsData').on('click', '.save-btn', function() {
+    const row = $(this).closest('tr');
+    const id = $(this).data('id');
+    const newName = row.find('.edit-name').val();
+    $.ajax({
+        url: `${API_BASE_URL}aliments.php?ID_ALIMENT=${id}`,
+        method: 'PUT',
+        contentType: 'application/json',
+        data: JSON.stringify({ NOM: newName }),
+        success: function(response) {
+            alert(`Aliment updated: ${response.NOM}`);
+            row.find('.editable-name').text(newName); // Update displayed name
+            $(this).text('Edit').removeClass('save-btn btn-success').addClass('edit-btn btn-warning');
+        },
+        error: function() {
+            alert("Failed to update aliment");
+        }
+    });
+});
+$('#tableHead').on('change', '#nutrientSelector', function() {
+    const selectedNutrient = $(this).val();
+    populateTable(selectedNutrient);
+});
     // Populate, Edit, Save, and nutrient selector handling code remains unchanged
     fetchAliments();
 });

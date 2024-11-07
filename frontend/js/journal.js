@@ -18,8 +18,8 @@ $(document).ready(function() {
                             <td>${entry.VALEUR_RATIO}</td>
                             <td>${entry.LAB}</td>
                             <td>
-                                <button class="btn btn-sm btn-warning edit-btn" data-id="${entry.id}">Edit</button>
-                                <button class="btn btn-sm btn-danger delete-btn" data-id="${entry.id}">Delete</button>
+                                <button class="btn btn-sm btn-warning edit-btn" data-id="${entry.ID_JOURNAL}">Edit</button>
+                                <button class="btn btn-sm btn-danger delete-btn" data-id="${entry.ID_JOURNAL}">Delete</button>
                             </td>
                         </tr>
                     `);
@@ -59,25 +59,14 @@ $(document).ready(function() {
                 method: 'GET',
                 data: { aliment_name: request.term },
                 success: function(data) {
-                    response($.map(data, function(item) {
-                        return {
-                            label: item.NOM,     
-                            value: item.ID_ALIMENT, 
-                            nom: item.NOM         
-                        };
-                    }));
+                    response(data);
                 },
                 error: function() {
                     alert("Failed to fetch aliment suggestions");
                 }
             });
         },
-        minLength: 2, 
-        select: function(event, ui) {
-            $('#aliment').val(ui.item.value); 
-            $('#editAliment').val(ui.item.nom); 
-            return false; 
-        }
+        minLength: 2  // Start searching after 2 characters
     });
 
     // Add Entry
@@ -85,9 +74,9 @@ $(document).ready(function() {
         event.preventDefault();
         let entryData = {
             DATE: $('#date').val(),
-            ID_ALIMENT: $('#aliment').val(),
+            NOM: $('#aliment').val(),
             QUANTITE: $('#quantity').val(),
-            ID_UTILISATEUR: sessionStorage.getItem('user_id'),
+            ID_UTILISATEUR: userId
         };
 
         $.ajax({
@@ -106,5 +95,66 @@ $(document).ready(function() {
         });
     });
 
-    // Edit and Delete functionality remains the same, but no session storage
+    // Edit Entry
+    $(document).on('click', '.edit-btn', function() {
+        let entryId = $(this).data('id');
+        
+        $.ajax({
+            url: API_BASE_URL + 'journal.php?ID=' + entryId,
+            method: 'GET',
+            success: function(entry) {
+                $('#editDate').val(entry.DATE);
+                $('#editAliment').val(entry.NOM);
+                $('#editQuantity').val(entry.QUANTITE);
+                $('#editEntryModal').modal('show');
+                $('#editEntryForm').data('id', entryId);
+            },
+            error: function() {
+                alert("Failed to load entry details");
+            }
+        });
+    });
+
+    $('#editEntryForm').submit(function(event) {
+        event.preventDefault();
+        let entryId = $(this).data('id');
+        let updatedData = {
+            DATE: $('#editDate').val(),
+            NOM: $('#editAliment').val(),
+            QUANTITE: $('#editQuantity').val()
+        };
+
+        $.ajax({
+            url: API_BASE_URL + 'journal.php?ID=' + entryId,
+            method: 'PUT',
+            data: JSON.stringify(updatedData),
+            contentType: "application/json",
+            success: function(response) {
+                alert("Entry updated successfully");
+                $('#editEntryModal').modal('hide');
+                fetchJournal();
+            },
+            error: function() {
+                alert("Failed to update entry");
+            }
+        });
+    });
+
+    // Delete Entry
+    $(document).on('click', '.delete-btn', function() {
+        let entryId = $(this).data('id');
+        if (confirm("Are you sure you want to delete this entry?")) {
+            $.ajax({
+                url: API_BASE_URL + 'journal.php?ID=' + entryId,
+                method: 'DELETE',
+                success: function(response) {
+                    alert("Entry deleted successfully");
+                    fetchJournal();
+                },
+                error: function() {
+                    alert("Failed to delete entry");
+                }
+            });
+        }
+    });
 });
