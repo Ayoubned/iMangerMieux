@@ -26,7 +26,6 @@ include 'config.php';
 </head>
 
 <body>
-
     <div class="container-fluid">
         <div class="row mt-4">
             <!-- Calories Card -->
@@ -62,21 +61,64 @@ include 'config.php';
                     </div>
                 </div>
             </div>
-        <!-- Average Nutritional Values Chart -->
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm p-3">
-                <h3 class="text-center">Average Nutritional Values</h3>
-                <canvas id="averageValuesChart" class="mx-auto" style="max-width: 100%; height: auto;"></canvas>
-            </div>
         </div>
 
-        <!-- Nutrient Intake Percentage Chart -->
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm p-3">
-                <h3 class="text-center">Nutrient Intake Percentage</h3>
-                <canvas id="nutrientPercentageChart" class="mx-auto" style="max-width: 100%; height: auto;"></canvas>
-            </div>
+        <!-- "More Details" Button -->
+        <div class="text-center my-4">
+            <button id="show-more-btn" class="btn btn-secondary">More Details</button>
         </div>
+
+        <!-- Hidden Detailed Stats and Charts -->
+        <div id="detailed-stats" class="container-fluid" style="display: none;">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3 class="text-center">All-Time Stats</h3>
+                    <div class="card shadow-sm p-3 mb-4">
+                        <h5>Total Nutritional Intake</h5>
+                        <p>Total Calories: <span id="total-calories-alltime">N/A</span></p>
+                        <p>Average Calories: <span id="average-calories-alltime">N/A</span></p>
+                        <p>Total Protein: <span id="total-protein-alltime">N/A</span></p>
+                        <p>Average Protein: <span id="average-protein-alltime">N/A</span></p>
+                        <p>Fruit & Veg Servings: <span id="fruit-veg-servings-alltime">N/A</span></p>
+                    </div>
+
+                    <!-- All-Time Average Values Bar Chart -->
+                    <div class="card shadow-sm p-3 mb-4">
+                        <h5 class="text-center">Average Nutritional Values (All Time)</h5>
+                        <canvas id="averageValuesChartAllTime"></canvas>
+                    </div>
+
+                    <!-- All-Time Nutrient Percentage Doughnut Chart -->
+                    <div class="card shadow-sm p-3">
+                        <h5 class="text-center">Nutrient Intake Percentage (All Time)</h5>
+                        <canvas id="nutrientPercentageChartAllTime"></canvas>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <h3 class="text-center">Last 7 Days Stats</h3>
+                    <div class="card shadow-sm p-3 mb-4">
+                        <h5>Total Nutritional Intake</h5>
+                        <p>Total Calories: <span id="total-calories-7days">N/A</span></p>
+                        <p>Average Calories: <span id="average-calories-7days">N/A</span></p>
+                        <p>Total Protein: <span id="total-protein-7days">N/A</span></p>
+                        <p>Average Protein: <span id="average-protein-7days">N/A</span></p>
+                        <p>Fruit & Veg Servings: <span id="fruit-veg-servings-7days">N/A</span></p>
+                    </div>
+
+                    <!-- Last 7 Days Average Values Bar Chart -->
+                    <div class="card shadow-sm p-3 mb-4">
+                        <h5 class="text-center">Average Nutritional Values (Last 7 Days)</h5>
+                        <canvas id="averageValuesChart7Days"></canvas>
+                    </div>
+
+                    <!-- Last 7 Days Nutrient Percentage Doughnut Chart -->
+                    <div class="card shadow-sm p-3">
+                        <h5 class="text-center">Nutrient Intake Percentage (Last 7 Days)</h5>
+                        <canvas id="nutrientPercentageChart7Days"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
