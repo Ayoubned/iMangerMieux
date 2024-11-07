@@ -1,19 +1,28 @@
-var ctx = document.getElementById('nutritionChart').getContext('2d');
-var nutritionChart = new Chart(ctx, {
-    type: 'line', // or 'bar', 'pie', etc.
-    data: {
-        labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'],
-        datasets: [{
-            label: 'Calories',
-            data: [2000, 2100, 1900, 2200, 2300, 1800, 2500],
-            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-            borderColor: 'rgba(54, 162, 235, 1)',
-            borderWidth: 1
-        }]
-    },
-    options: {
-        scales: {
-            yAxes: [{ ticks: { beginAtZero: true } }]
-        }
-    }
+$(document).ready(function() {
+    // Fetch dashboard data using AJAX
+    fetchDashboardData();
 });
+
+function fetchDashboardData() {
+    $.ajax({
+        url: API_BASE_URL + 'journal.php', 
+        method: 'GET',
+        dataType: 'json',
+        success: function(data) {
+            // Update dashboard elements with the data received
+            $('#total-calories').text(data.totalCalories || 'N/A');
+            $('#average-calories').text(data.averageCalories || 'N/A');
+            $('#total-protein').text(data.totalProtein || 'N/A');
+            $('#average-protein').text(data.averageProtein || 'N/A');
+            $('#fruit-veg-servings').text(data.fruitVegServings || 'N/A');
+        },
+        error: function(xhr, status, error) {
+            console.error('Error fetching dashboard data:', error);
+            $('#total-calories').text('Error');
+            $('#average-calories').text('Error');
+            $('#total-protein').text('Error');
+            $('#average-protein').text('Error');
+            $('#fruit-veg-servings').text('Error');
+        }
+    });
+}
