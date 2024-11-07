@@ -60,11 +60,10 @@ function getDashboardData($db)
         SELECT COUNT(*) AS fruit_veg_servings
         FROM journal j
         JOIN reference r ON j.ID_JOURNAL = r.ID_JOURNAL
-        JOIN contient c ON r.ID_ALIMENT = c.ID_ALIMENT
-        JOIN type_ratio tr ON c.ID_TR = tr.ID_TR
+        JOIN type_aliment ta ON r.ID_ALIMENT = ta.ID_ALIMENT
         WHERE j.ID_UTILISATEUR = :user_id
           AND j.DATE >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
-          AND tr.LAB = 'Fruit/Vegetable'  -- Adjust as needed if label differs
+          AND ta.LAB = 'fruit' OR ta.LAB = 'vegetable'
     ";
     $stmtFruitVeg = $db->prepare($fruitVegQuery);
     $stmtFruitVeg->execute(['user_id' => $_SESSION['user_id']]);
