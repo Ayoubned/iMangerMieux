@@ -1,6 +1,10 @@
-<?php
-session_start();
+<?php 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 ?>
+
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a class="navbar-brand" href="index.php?page=dashboard">iMangerMieux</a>

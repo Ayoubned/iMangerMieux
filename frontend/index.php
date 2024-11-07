@@ -1,9 +1,17 @@
+<?php
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    // Redirect to home if not logged in
+    header("Location: home.php");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Food Tracker</title>
+    <title>IMM</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     
     <?php

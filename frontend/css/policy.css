@@ -1,0 +1,121 @@
+/* policy-styles.css */
+
+/* Root Variables */
+:root {
+    --primary-color: #28a745;
+    --secondary-color: #f8f9fa;
+    --text-color: #343a40;
+    --light-text: #6c757d;
+    --link-color: #007bff;
+    --heading-color: #28a745;
+}
+
+/* Global Styles */
+body {
+    font-family: Arial, sans-serif;
+    color: var(--text-color);
+    background-color: var(--secondary-color);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Navbar */
+
+
+/* Main Content */
+.container {
+    max-width: 900px;
+    width: 100%;
+    padding: 2rem;
+    margin-top: 2rem;
+    background-color: #ffffff;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+h1 {
+    color: var(--heading-color);
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+h2 {
+    color: var(--heading-color);
+    font-size: 1.75rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid var(--heading-color);
+    padding-bottom: 0.5rem;
+}
+
+p {
+    font-size: 1rem;
+    color: var(--text-color);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+a {
+    color: var(--link-color);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Footer */
+footer {
+    width: 100%;
+    background-color: #f1f1f1;
+    padding: 1rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--light-text);
+    margin-top: 2rem;
+    border-top: 1px solid #e0e0e0;
+}
+
+footer a {
+    color: var(--heading-color);
+    text-decoration: none;
+}
+
+footer a:hover {
+    color: var(--link-color);
+}
+
+/* Button Styling for Links */
+.btn {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    color: #ffffff;
+    background-color: var(--primary-color);
+    border-radius: 0.25rem;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.btn:hover {
+    background-color: #218838;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 1.5rem;
+    }
+    
+    h1 {
+        font-size: 2rem;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+}
