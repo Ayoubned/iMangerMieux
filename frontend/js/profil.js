@@ -1,57 +1,39 @@
 document.addEventListener("DOMContentLoaded", function() {
-    // Load data from sessionStorage to pre-fill the form fields
-    document.getElementById("username").value = sessionStorage.getItem("username") || "";
+    const profileForm = document.getElementById('profileForm');
+    if (profileForm) {
+        profileForm.addEventListener('submit', async function(e) {
+            e.preventDefault(); // Prevent default form submission
 
-    const ageGroup = sessionStorage.getItem("Age Category");
-    if (ageGroup) {
-        document.getElementById("age").value = ageGroup;
+            const ageGroup = document.getElementById('age').value;
+            const gender = document.getElementById('gender').value;
+            const activityLevel = document.getElementById('activity').value;
+            const url = API_BASE_URL;
+
+            // Send POST request to update the profile
+            try {
+                const response = await fetch(`${url}users.php`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        update: true,  // Ensures backend understands this is an update
+                        ID_AGE: ageGroup,
+                        ID_SEXE: gender,
+                        ID_NS: activityLevel
+                    })
+                });
+
+                if (response.ok) {
+                    alert('Profile updated successfully');
+                } else {
+                    const error = await response.json();
+                    alert(error.message || 'Failed to update profile');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An unexpected error occurred.');
+            }
+        });
+    } else {
+        console.error("Profile form not found. Check if the form's ID is 'profileForm'.");
     }
-
-    const gender = sessionStorage.getItem("Gender");
-    if (gender) {
-        document.getElementById("gender").value = gender;
-    }
-
-    const activityLevel = sessionStorage.getItem("Activity level");
-    if (activityLevel) {
-        document.getElementById("activity").value = activityLevel;
-    }
-});
-
-document.getElementById('profileForm').addEventListener('submit', async function(e) {
-    e.preventDefault(); // Prevent default form submission
-
-    const ageGroup = document.getElementById('age').value;
-    const gender = document.getElementById('gender').value;
-    const activityLevel = document.getElementById('activity').value;
-    const userId = sessionStorage.getItem('user_id');
-
-    // Send PUT request to update the profile
-    const response = await fetch(`../../backend/users.php?ID_UTILISATEUR=${userId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            ID_AGE: ageGroup,
-            ID_SEXE: gender,
-            ID_NS: activityLevel
-        })
-    });
-    const textResponse = await response.text();
-    console.log('Server response:', textResponse); // Log the actual response
-    
-    try {
-        const result = JSON.parse(textResponse);
-        if (response.ok) {
-            alert('Profile updated successfully');
-            sessionStorage.setItem("Age Category", ageGroup);
-            sessionStorage.setItem("Gender", gender);
-            sessionStorage.setItem("Activity level", activityLevel);
-        } else {
-            alert(result.error || 'Failed to update profile');
-        }
-    } catch (error) {
-        console.error('Error parsing JSON:', error);
-        alert('Unexpected error occurred.');
-    }
-    
 });

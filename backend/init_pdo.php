@@ -1,6 +1,6 @@
 <?php
 // Load the database configuration
-require_once('config.php');
+require_once(__DIR__ . '/config.php'); // Ensure this is the correct path
 
 try {
     // Build the connection string
