@@ -1,3 +1,31 @@
+<?php
+session_start();
+include("config.php");
+require_once(__DIR__ . "/../backend/init_pdo.php");
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+
+    $stmt = $pdo->prepare("SELECT * FROM utilisateur WHERE USERNAME = ?");
+    $stmt->execute([$username]);
+    $user = $stmt->fetch(PDO::FETCH_OBJ);
+
+    if ($user && password_verify($password, $user->PASSWORD)) {
+        $_SESSION['user_id'] = $user->ID_UTILISATEUR;
+        $_SESSION['username'] = $user->USERNAME;
+        $_SESSION['age_group'] = $user->ID_AGE;
+        $_SESSION['gender'] = $user->ID_SEXE;
+        $_SESSION['activity_level'] = $user->ID_NS;
+
+        header("Location: dashboard.php");
+        exit;
+    } else {
+        $error = "Invalid credentials";
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,6 +34,9 @@
     <title>Login</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/login.css">
+    <script>
+        const API_BASE_URL = "<?php echo API_BASE_URL; ?>";
+    </script>
 </head>
 <body>
 
@@ -17,7 +48,12 @@
 
 <div class="container form-container">
     <h2 class="text-center">Login to Your Account</h2>
-    <form id="loginForm">
+    <?php if (isset($error)): ?>
+        <div class="alert alert-danger" role="alert">
+            <?php echo $error; ?>
+        </div>
+    <?php endif; ?>
+    <form method="POST" action="login.php" id="loginForm">
         <div class="form-group">
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" class="form-control" required>

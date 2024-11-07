@@ -3,8 +3,9 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
 
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
+    const url = API_BASE_URL;
 
-    const response = await fetch(`../backend/users.php?action=login`, {
+    const response = await fetch(url + `users.php?action=login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
@@ -12,17 +13,8 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
 
     const result = await response.json();
     if (response.ok) {
-        // Store user information in session storage if needed
-        sessionStorage.setItem('user_id', result.user.ID_UTILISATEUR);
-        sessionStorage.setItem('username', result.user.USERNAME);
-        sessionStorage.setItem('Age Category', result.user.ID_AGE);
-        sessionStorage.setItem('Gender', result.user.ID_SEXE);
-        sessionStorage.setItem('Activity level', result.user.ID_NS);
-
-        
-        // Redirect to the homepage
+        // Redirect to the homepage upon successful login
         window.location.href = 'index.php';
-
     } else {
         alert(result.error);
     }

@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once("init_pdo.php");
 
 function search_aliments($db, $name)
@@ -16,11 +17,10 @@ function setHeaders()
 
 setHeaders();
 
-// Handle search requests for aliment suggestions
-if ($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["aliment_name"])) {
-    $aliment_name = $_GET["aliment_name"];
-    $suggestions = search_aliments($pdo, $aliment_name);
-    echo json_encode($suggestions);
+// Check if the user is authenticated
+if (!isset($_SESSION['user_id'])) {
+    http_response_code(401);
+    echo json_encode(["error" => "User not authenticated"]);
     exit;
 }
 
@@ -61,10 +61,7 @@ function delete_aliment($db, $ID_ALIMENT)
     return $stmt->execute([$ID_ALIMENT]);
 }
 
-
-// =================
 // Handle API Requests
-// =================
 switch ($_SERVER["REQUEST_METHOD"]) {
     case 'GET':
         if (isset($_GET['ID_ALIMENT'])) {
@@ -79,12 +76,12 @@ switch ($_SERVER["REQUEST_METHOD"]) {
                                    GROUP BY aliment.ID_ALIMENT");
             $stmt->execute([$_GET['ID_ALIMENT']]);
             $aliment = $stmt->fetch(PDO::FETCH_OBJ);
-            if (json_encode($aliment) == 'false') {
+            if (!$aliment) {
                 http_response_code(404);
-                echo json_encode(["error" => "aliment not found"]);
-                break;
+                echo json_encode(["error" => "Aliment not found"]);
+            } else {
+                echo json_encode($aliment);
             }
-            echo json_encode($aliment);
         } else {
             $result = get_aliment($pdo);
             echo json_encode($result);
@@ -94,9 +91,9 @@ switch ($_SERVER["REQUEST_METHOD"]) {
     case 'POST':
         $data = json_decode(file_get_contents('php://input'), true);
         if (isset($data['NOM'])) {
-            $alimentID_ALIMENT = create_aliment($pdo, $data);
+            $alimentID = create_aliment($pdo, $data);
             http_response_code(201);
-            echo json_encode(["ID_ALIMENT" => $alimentID_ALIMENT, "NOM" => $data['NOM']]);
+            echo json_encode(["ID_ALIMENT" => $alimentID, "NOM" => $data['NOM']]);
         } else {
             http_response_code(400);
             echo json_encode(["error" => "Invalid input data"]);
@@ -111,26 +108,19 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 
             if (!$aliment) {
                 http_response_code(404);
-                echo json_encode(["error" => "aliment not found"]);
-                break;
-            }
-            $ID_ALIMENT = $_GET['ID_ALIMENT'];
-            $data = json_decode(file_get_contents('php://input'), true);
-            if (isset($data['NOM'])) {
-                if (update_aliment($pdo, $ID_ALIMENT, $data)) {
-                    http_response_code(200);
-                    echo json_encode(["ID_ALIMENT" => $ID_ALIMENT, "NOM" => $data['NOM']]);
+                echo json_encode(["error" => "Aliment not found"]);
+            } else {
+                $data = json_decode(file_get_contents('php://input'), true);
+                if (isset($data['NOM']) && update_aliment($pdo, $_GET['ID_ALIMENT'], $data)) {
+                    echo json_encode(["ID_ALIMENT" => $_GET['ID_ALIMENT'], "NOM" => $data['NOM']]);
                 } else {
-                    http_response_code(500);
+                    http_response_code(400);
                     echo json_encode(["error" => "Failed to update aliment"]);
                 }
-            } else {
-                http_response_code(400);
-                echo json_encode(["error" => "Invalid input data"]);
             }
         } else {
             http_response_code(400);
-            echo json_encode(["error" => "aliment ID_ALIMENT is required"]);
+            echo json_encode(["error" => "Aliment ID is required"]);
         }
         break;
 
@@ -142,11 +132,10 @@ switch ($_SERVER["REQUEST_METHOD"]) {
 
             if (!$aliment) {
                 http_response_code(404);
-                echo json_encode(["error" => "aliment not found"]);
+                echo json_encode(["error" => "Aliment not found"]);
             } else {
                 if (delete_aliment($pdo, $_GET['ID_ALIMENT'])) {
-                    http_response_code(200);
-                    echo json_encode(["message" => "aliment deleted"]);
+                    echo json_encode(["message" => "Aliment deleted successfully"]);
                 } else {
                     http_response_code(500);
                     echo json_encode(["error" => "Failed to delete aliment"]);
@@ -154,7 +143,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
             }
         } else {
             http_response_code(400);
-            echo json_encode(["error" => "aliment ID_ALIMENT is required"]);
+            echo json_encode(["error" => "Aliment ID is required"]);
         }
         break;
 

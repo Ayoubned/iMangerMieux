@@ -1,3 +1,15 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
+}
+include 'config.php';
+$url=API_BASE_URL;
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,13 +18,12 @@
     <title>Aliments</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css" rel="stylesheet">
-    <?php include 'config.php'; ?>
     <script>
         const API_BASE_URL = "<?php echo API_BASE_URL; ?>";
     </script>
-
+</head>
+<body>
     <div class="container">
-
         <h2 class="mt-4">Aliments List</h2>
         <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#addAlimentModal">Add New Aliment</button>
 
@@ -20,7 +31,6 @@
             <thead id="tableHead">
                 <tr>
                     <th>Name</th>
-                    <!-- Additional columns for each ratio will be added here dynamically -->
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -43,7 +53,6 @@
                             <label for="alimentName">Aliment Name</label>
                             <input type="text" class="form-control" id="alimentName" name="alimentName" required>
                         </div>
-                        <!-- Additional fields can be added here for each ratio if needed -->
                         <button type="submit" class="btn btn-primary">Save Aliment</button>
                     </form>
                 </div>
