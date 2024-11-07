@@ -2,7 +2,7 @@
 session_start();
 require_once("init_pdo.php");
 
-function get_journals($db)
+function get_journals($db, $user_id) 
 {
     $sql = "SELECT 
     journal.ID_JOURNAL,
@@ -18,9 +18,10 @@ JOIN aliment ON reference.ID_ALIMENT = aliment.ID_ALIMENT
 JOIN contient ON aliment.ID_ALIMENT = contient.ID_ALIMENT
 JOIN type_aliment ON aliment.ID_ALIMENT = type_aliment.ID_ALIMENT
 WHERE 
-    contient.ID_TR = (SELECT ID_TR FROM type_ratio WHERE LAB = 'Energie (kj/100g)') ;";
-    $exe = $db->query($sql);
-    $res = $exe->fetchAll(PDO::FETCH_OBJ);
+    contient.ID_TR = (SELECT ID_TR FROM type_ratio WHERE LAB = 'Energie (kj/100g)') AND journal.ID_UTILISATEUR = ? ;";
+    $stmt = $db->prepare($sql);
+    $stmt->execute([$user_id]);
+    $res = $stmt->fetchAll(PDO::FETCH_OBJ);
     return $res;
 }
 
@@ -178,7 +179,7 @@ switch ($_SERVER["REQUEST_METHOD"]) {
                 echo json_encode($journal);
             }
         } else {
-            $result = get_journals($pdo);
+            $result = get_journals($pdo, $_SESSION['user_id']);
             echo json_encode($result);
         }
         break;
