@@ -18,6 +18,7 @@ $url=API_BASE_URL;
     <title>Aliments</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/aliments.css">
     <script>
         const API_BASE_URL = "<?php echo API_BASE_URL; ?>";
     </script>

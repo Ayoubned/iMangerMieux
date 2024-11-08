@@ -1,0 +1,23 @@
+/* Journal Table Styling */
+#journalTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 1em;
+    background-color: #e8f5e9; /* Light green background */
+}
+
+#journalTable th, #journalTable td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+#journalTable th {
+    background-color: #66bb6a; /* Dark green for header */
+    color: white;
+}
+
+#journalTable tbody tr:hover {
+    background-color: #c8e6c9; /* Very light green on hover */
+}

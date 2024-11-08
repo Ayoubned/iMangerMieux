@@ -17,6 +17,7 @@ include 'config.php';
     <title>Food Journal</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="css/journal.css">
     <script>
         const API_BASE_URL = "<?php echo API_BASE_URL; ?>";
         const userId = <?php echo json_encode($_SESSION['user_id']); ?>;
