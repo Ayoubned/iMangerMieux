@@ -1,129 +1,145 @@
-# iMangerMieux
-Une application Web permettant de maintenir un journal de tous les aliments consommés.
 
-## Table des matières
-1. [Structure des Fichiers](#structure-des-fichiers)
-2. [Configuration de l'Environnement](#configuration-de-lenvironnement)
-3. [Importer les Données dans la Base de Données](#importer-les-données-dans-la-base-de-données)
-4. [Fonctionnalités CRUD](#fonctionnalités-crud)
-5. [Tests Unitaires](#tests-unitaires)
+# iMangerMieux
+
+A web application for maintaining a journal of consumed foods and tracking nutritional intake.
+
+## Table of Contents
+
+1. [File Structure](#file-structure)
+2. [Environment Configuration](#environment-configuration)
+3. [Importing Data into the Database](#importing-data-into-the-database)
+4. [CRUD Functionalities](#crud-functionalities)
+5. [Unit Tests](#unit-tests)
 
 ---
 
-## Structure des Fichiers
+## File Structure
 
-Le projet est structuré comme suit :
+The project is organized into backend and frontend sections:
 
+### Backend
 ```
 backend/
-│
-├── sql/
-│   ├── aliments.csv           # Données pour la table 'aliment'
-│   ├── database.sql            # Script SQL pour créer les tables
-│   ├── users.csv               # Données pour la table 'utilisateur'
-│
-├── tests/
-│   ├── test_aliments.php       # Tests CRUD pour 'aliment'
-│   ├── test_journal.php        # Tests CRUD pour 'journal'
-│   ├── test_users.php          # Tests CRUD pour 'utilisateur'
-│
-├── aliments.php                # API CRUD pour 'aliment'
-├── journal.php                 # API CRUD pour 'journal'
-├── users.php                   # API CRUD pour 'utilisateur'
-├── config.php                  # Configuration (ex. paramètres de connexion)
-├── csvinjection.php            # Importation CSV et prévention d'injection
-├── init_db.php                 # Initialisation de la BDD à partir de 'database.sql'
-├── init_pdo.php                # Connexion PDO à la base de données
+├── aliments.php                # CRUD API for 'aliment'
+├── config.php                  # Database configuration
+├── csvinjection.php            # Helper for CSV injection prevention
+├── dashboard.php               # Dashboard data aggregation
+├── init_db.php                 # Initializes database tables
+├── init_pdo.php                # PDO connection setup
+├── journal.php                 # CRUD API for 'journal' entries
+├── users.php                   # CRUD API for 'users'
+└── sql/
+    ├── aliments.csv            # Sample data for 'aliment' table
+    ├── database.sql            # SQL script to create tables
+    └── users.csv               # Sample data for 'users' table
+└── tests/
+    ├── test_aliments.php       # Unit tests for 'aliments'
+    ├── test_journal.php        # Unit tests for 'journal'
+    └── test_users.php          # Unit tests for 'users'
+```
 
+### Frontend
+```
+frontend/
+├── aliments.php                # Page displaying aliments data
+├── config.php                  # Frontend configuration
+├── dashboard.php               # User dashboard with metrics
+├── footer.php                  # Footer component
+├── home.php                    # Home page
+├── index.php                   # Main entry dashboard
+├── journal.php                 # Page to view/edit food journal
+├── login.php                   # Login form
+├── logout.php                  # Logout handling
+├── navbar.php                  # Navigation bar component
+├── privacy.php                 # Privacy policy page
+├── profil.php                  # User profile management
+├── README.rdm                  # Frontend-specific README
+├── signup.php                  # User signup form
+├── terms.php                   # Terms and conditions page
+└── css/
+    ├── homecss.css             # CSS for home page
+    ├── login.css               # CSS for login form
+    ├── policy.css              # CSS for policies
+    ├── signup.css              # CSS for signup form
+    └── style.css               # General styling
+└── js/
+    ├── aliments.js             # JS for aliments page interactions
+    ├── dashboard.js            # JS for dashboard interactivity
+    ├── journal.js              # JS for journal page interactions
+    ├── login.js                # JS for login form validation
+    ├── profil.js               # JS for profile page management
+    └── signup.js               # JS for signup form validation
+```
 
----
+## Environment Configuration
 
-## Configuration de l'Environnement
+1. **Clone the repository**: Download the project files from GitHub.
+   
+   ```bash
+   git clone https://github.com/HAOUA-Hamid/iMangerMieux.git
+   ```
 
-### Prérequis
-1. **Serveur WAMP** : Installez un serveur local (WAMP, LAMP, MAMP, etc.).
-2. **PHP** : Assurez-vous que PHP est installé.
-3. **MySQL** : Utilisez MySQL via votre serveur local.
+2. **Server Setup**: Use a PHP-supported server (e.g., Apache) with MySQL for the database.
 
-### Initialisation
-1. Clonez le projet ou copiez tous les fichiers dans votre dossier de serveur WAMP.
-2. Créez une base de données nommée `projet_idaw` dans **phpMyAdmin** ou un autre outil de gestion MySQL.
-3. Modifiez `config.php` avec vos informations de connexion (hôte, utilisateur, mot de passe, etc.).
+3. **Configuration Files**: Update `config.php` files in both `backend/` and `frontend/` directories with your database credentials.
 
-### Démarrage du Serveur
-Lancez le serveur WAMP et assurez-vous que les fichiers sont accessibles via `http://localhost/imangermieux/backend/`.
+## Importing Data into the Database
 
----
-## Importer les Données dans la Base de Données
+To initialize and populate the database with CSV files and the SQL script, follow these steps:
 
-Pour initialiser et remplir la base de données avec les fichiers CSV et le script SQL, suivez ces étapes :
-
-### 1. Initialisation de la Base de Données
-- Exécutez `init_db.php` pour créer les tables à partir de `database.sql`.
-- Accédez à :
+### 1. Database Initialization
+- Execute `init_db.php` to create tables using `database.sql`.
+- Access:
    ```
    http://localhost/imangermieux/backend/init_db.php
    ```
-Une fois exécuté, ce script indique si la création des tables a réussi.
+After running, this script will indicate if the table creation was successful.
 
-### 2. Importation des Données Aliments et Utilisateurs
-- Exécutez `csvinjection.php` pour importer les données de `aliments.csv` et `users.csv` dans les tables `aliment` et `utilisateur`.
-- Accédez à :
+### 2. Importing Aliments and Users Data
+- Run `csvinjection.php` to import data from `aliments.csv` and `users.csv` into the `aliment` and `utilisateur` tables.
+- Access:
    ```
    http://localhost/imangermieux/backend/csvinjection.php
    ```
-Ce script convertit aussi certains caractères risqués pour éviter l'injection CSV et insère les données dans les tables correspondantes.
+This script also sanitizes risky characters to prevent CSV injection and inserts the data into the respective tables.
+
+## CRUD Functionalities
+
+### Backend API Endpoints
+
+- **Aliments API** (`backend/aliments.php`)
+  - `GET /aliments`: Fetch all or specific aliment by ID.
+  - `POST /aliments`: Create new aliment entry.
+  - `PUT /aliments/{ID_ALIMENT}`: Update specific aliment.
+  - `DELETE /aliments/{ID_ALIMENT}`: Delete specific aliment.
+
+- **Journal API** (`backend/journal.php`)
+  - `GET /journal`: Retrieve all journal entries or specific by ID.
+  - `POST /journal`: Create new journal entry.
+  - `PUT /journal/{ID_JOURNAL}`: Update specific journal entry.
+  - `DELETE /journal/{ID_JOURNAL}`: Delete specific journal entry.
+
+- **Users API** (`backend/users.php`)
+  - `GET /users`: Retrieve all users or specific user by ID.
+  - `POST /users`: Register a new user.
+  - `PUT /users/{ID_UTILISATEUR}`: Update user information.
+  - `DELETE /users/{ID_UTILISATEUR}`: Delete user.
+
+### Frontend Pages
+
+- **Home** (`frontend/home.php`): Provides an introduction to the app.
+- **Dashboard** (`frontend/dashboard.php`): Displays nutritional data.
+- **Journal** (`frontend/journal.php`): Manages user’s daily food intake.
+- **Profile** (`frontend/profil.php`): Edit user-specific data.
+- **Aliments** (`frontend/aliments.php`): View and manage aliments data.
+
+## Unit Tests
+
+Backend unit tests are included in `backend/tests/`, covering CRUD functionalities for:
+- **Aliments**: Validates `aliments.php` endpoints.
+- **Journal**: Verifies `journal.php` endpoints.
+- **Users**: Tests `users.php` endpoints.
 
 ---
 
-## Fonctionnalités CRUD
-
-### 1. Aliments
-L'API pour les aliments, via `aliments.php`, permet :
-- **GET** : Récupération d'un ou plusieurs aliments.
-- **POST** : Ajout d'un nouvel aliment.
-- **PUT** : Mise à jour d'un aliment existant.
-- **DELETE** : Suppression d'un aliment.
-
-### 2. Journal
-Dans `journal.php` :
-- **GET** : Récupération d'entrées de journal.
-- **POST** : Ajout d'une nouvelle entrée.
-- **PUT** : Mise à jour d'une entrée.
-- **DELETE** : Suppression d'une entrée.
-
-### 3. Utilisateurs
-L'API `users.php` permet :
-- **GET** : Récupération d'utilisateurs.
-- **POST** : Ajout d'un nouvel utilisateur.
-- **PUT** : Mise à jour d'un utilisateur existant.
-- **DELETE** : Suppression d'un utilisateur.
-
----
-
-## Tests Unitaires
-
-Les tests unitaires se trouvent dans le dossier `tests/`.
-
-### Exécution des Tests
-
-Accédez aux fichiers de test via un navigateur :
-   - `test_aliments.php` : Teste les opérations CRUD pour les aliments.
-   - `test_journal.php` : Teste les opérations CRUD pour le journal.
-   - `test_users.php` : Teste les opérations CRUD pour les utilisateurs.
-
-Pour chaque test, ouvrez l'URL suivante dans votre navigateur :
-   ```
-   http://localhost/imangermieux/backend/tests/test_aliments.php
-   http://localhost/imangermieux/backend/tests/test_journal.php
-   http://localhost/imangermieux/backend/tests/test_users.php
-   ```
-Les résultats indiqueront si chaque opération CRUD a réussi ou échoué.
-
----
-
-
-## Contact
-
-Si vous avez des questions, veuillez contacter l'administrateur du projet ou consultez la documentation de PHP et MySQL pour plus de détails.
-```
+This README provides an overview of iMangerMieux’s structure, setup instructions, and core functionalities for contributors and developers.
