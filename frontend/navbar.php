@@ -25,6 +25,9 @@ if (session_status() === PHP_SESSION_NONE) {
             <li class="nav-item">
                 <a class="nav-link" href="index.php?page=profil">Profile</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="index.php?page=map">Map</a>
+            </li>
             <li class="nav-item" id="auth-link">
                 <?php if (isset($_SESSION['username'])): ?>
                     <a class="nav-link" href="logout.php">Sign Out</a>
