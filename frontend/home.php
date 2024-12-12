@@ -19,7 +19,6 @@ if (isset($_SESSION['user_id'])) {
     <link rel="stylesheet" href="css/homecss.css">
 </head>
 <body>
-
     <!-- Hero Section -->
     <header class="jumbotron text-center my-4">
         <h1 class="display-4">Welcome to iMangerMieux</h1>
