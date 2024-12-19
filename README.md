@@ -56,11 +56,13 @@ frontend/
 ├── README.rdm                  # Frontend-specific README
 ├── signup.php                  # User signup form
 ├── terms.php                   # Terms and conditions page
+├── map.php                     # Map
 └── css/
     ├── homecss.css             # CSS for home page
     ├── login.css               # CSS for login form
     ├── policy.css              # CSS for policies
     ├── signup.css              # CSS for signup form
+    ├── map.css                 # CSS for map page
     └── style.css               # General styling
 └── js/
     ├── aliments.js             # JS for aliments page interactions
@@ -68,6 +70,7 @@ frontend/
     ├── journal.js              # JS for journal page interactions
     ├── login.js                # JS for login form validation
     ├── profil.js               # JS for profile page management
+    ├── map.js                  # JS for map page
     └── signup.js               # JS for signup form validation
 ```
 
@@ -82,6 +85,8 @@ frontend/
 2. **Server Setup**: Use a PHP-supported server (e.g., Apache) with MySQL for the database.
 
 3. **Configuration Files**: Update `config.php` files in both `backend/` and `frontend/` directories with your database credentials.
+
+4. **API Configuration**: Update `map.php` file in `frontend/` directory with your API Key.
 
 ## Importing Data into the Database
 

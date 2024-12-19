@@ -28,7 +28,8 @@ include 'config.php';
 <div class="container mt-5">
     <h2 class="text-center">Food Journal</h2>
     <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#addEntryModal">Add New Entry</button>
-    
+    <button class="btn btn-secondary mb-3" data-toggle="modal" data-target="#addCustomCalorieModal">Add Custom Calories</button>
+
     <table id="journalTable" class="table table-bordered">
         <thead>
             <tr>
@@ -44,6 +45,7 @@ include 'config.php';
     </table>
 </div>
 
+<!-- Add Entry Modal -->
 <div id="addEntryModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="addEntryModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -71,6 +73,36 @@ include 'config.php';
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary">Add Entry</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Custom Calorie Modal -->
+<div id="addCustomCalorieModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="addCustomCalorieModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCustomCalorieModalLabel">Add Custom Calorie Entry</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="addCustomCalorieForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="customDate">Date</label>
+                        <input type="date" class="form-control" id="customDate" name="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="customCalories">Calories</label>
+                        <input type="number" class="form-control" id="customCalories" name="calories" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add Custom Entry</button>
                 </div>
             </form>
         </div>

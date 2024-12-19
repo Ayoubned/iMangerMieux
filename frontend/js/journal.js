@@ -10,15 +10,17 @@ $(document).ready(function() {
             success: function(data) {
                 $('#journalData').html('');
                 data.forEach(entry => {
+                    const isCustom = entry.VALEUR_RATIO == null;
+                    const valeurRatio = entry.VALEUR_RATIO !== null ? entry.VALEUR_RATIO : entry.CUSTOM_CALORIES;
                     $('#journalData').append(`
                         <tr>
                             <td>${entry.DATE}</td>
-                            <td>${entry.NOM}</td>
-                            <td>${entry.QUANTITE}</td>
-                            <td>${entry.VALEUR_RATIO}</td>
-                            <td>${entry.LAB}</td>
+                            <td>${isCustom ? "-" : entry.NOM}</td>
+                            <td>${isCustom ? "-" : entry.QUANTITE}</td>
+                            <td>${valeurRatio}</td>
+                            <td>${isCustom ? "Custom" : entry.LAB}</td>
                             <td>
-                                <button class="btn btn-sm btn-warning edit-btn" data-id="${entry.ID_JOURNAL}">Edit</button>
+                                <button class="btn btn-sm btn-warning edit-btn" data-id="${entry.ID_JOURNAL}" ${isCustom ? "disabled" : ""}>Edit</button>
                                 <button class="btn btn-sm btn-danger delete-btn" data-id="${entry.ID_JOURNAL}">Delete</button>
                             </td>
                         </tr>
@@ -48,28 +50,10 @@ $(document).ready(function() {
                 }
             });
         },
-        minLength: 2  // Start searching after 2 characters
+        minLength: 2
     });
 
-    // Autocomplete for aliment field in Edit Entry Modal
-    $('#editAliment').autocomplete({
-        source: function(request, response) {
-            $.ajax({
-                url: API_BASE_URL + 'aliments.php',
-                method: 'GET',
-                data: { aliment_name: request.term },
-                success: function(data) {
-                    response(data);
-                },
-                error: function() {
-                    alert("Failed to fetch aliment suggestions");
-                }
-            });
-        },
-        minLength: 2  // Start searching after 2 characters
-    });
-
-    // Add Entry
+    // Add Regular Entry
     $('#addEntryForm').submit(function(event) {
         event.preventDefault();
         let entryData = {
@@ -84,7 +68,7 @@ $(document).ready(function() {
             method: 'POST',
             data: JSON.stringify(entryData),
             contentType: "application/json",
-            success: function(response) {
+            success: function() {
                 alert("Entry added successfully");
                 $('#addEntryModal').modal('hide');
                 fetchJournal();
@@ -95,47 +79,29 @@ $(document).ready(function() {
         });
     });
 
-    // Edit Entry
-    $(document).on('click', '.edit-btn', function() {
-        let entryId = $(this).data('id');
-        
-        $.ajax({
-            url: API_BASE_URL + 'journal.php?ID=' + entryId,
-            method: 'GET',
-            success: function(entry) {
-                $('#editDate').val(entry.DATE);
-                $('#editAliment').val(entry.NOM);
-                $('#editQuantity').val(entry.QUANTITE);
-                $('#editEntryModal').modal('show');
-                $('#editEntryForm').data('id', entryId);
-            },
-            error: function() {
-                alert("Failed to load entry details");
-            }
-        });
-    });
-
-    $('#editEntryForm').submit(function(event) {
+    // Add Custom Calorie Entry
+    $('#addCustomCalorieForm').submit(function(event) {
         event.preventDefault();
-        let entryId = $(this).data('id');
-        let updatedData = {
-            DATE: $('#editDate').val(),
-            NOM: $('#editAliment').val(),
-            QUANTITE: $('#editQuantity').val()
+        let customData = {
+            DATE: $('#customDate').val(),
+            NOM: "custom calories",
+            QUANTITE: 1,
+            CUSTOM_CALORIES: $('#customCalories').val(),
+            ID_UTILISATEUR: userId
         };
 
         $.ajax({
-            url: API_BASE_URL + 'journal.php?ID=' + entryId,
-            method: 'PUT',
-            data: JSON.stringify(updatedData),
+            url: API_BASE_URL + 'journal.php',
+            method: 'POST',
+            data: JSON.stringify(customData),
             contentType: "application/json",
-            success: function(response) {
-                alert("Entry updated successfully");
-                $('#editEntryModal').modal('hide');
+            success: function() {
+                alert("Custom calorie entry added successfully");
+                $('#addCustomCalorieModal').modal('hide');
                 fetchJournal();
             },
             error: function() {
-                alert("Failed to update entry");
+                alert("Failed to add custom calorie entry");
             }
         });
     });
@@ -147,7 +113,7 @@ $(document).ready(function() {
             $.ajax({
                 url: API_BASE_URL + 'journal.php?ID=' + entryId,
                 method: 'DELETE',
-                success: function(response) {
+                success: function() {
                     alert("Entry deleted successfully");
                     fetchJournal();
                 },
