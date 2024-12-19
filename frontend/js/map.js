@@ -97,7 +97,7 @@ function searchLocation() {
     if (status === google.maps.GeocoderStatus.OK) {
       searchedLocation = results[0].geometry.location;
       map.setCenter(searchedLocation);
-      addMarker(searchedLocation.toJSON(), "Searched Location");
+      addMarker(searchedLocation, "Searched Location");
     } else {
       alert("Geocode was not successful for the following reason: " + status);
     }
@@ -141,7 +141,7 @@ function displayFacilities() {
     (results, status) => {
       if (status === google.maps.places.PlacesServiceStatus.OK) {
         results.forEach((place) => {
-          addMarker(place.geometry.location.toJSON(), place.name);
+          addMarker(place.geometry.location, place.name);
         });
       } else {
         alert("No facilities found in the selected area.");
@@ -151,120 +151,70 @@ function displayFacilities() {
 }
 
 function generateTrajectory() {
-    const location = searchedLocation || userLocation;
-    if (!location) {
-      alert("Please enable location services or search for a location.");
-      return;
+  const location = searchedLocation || userLocation;
+  if (!location) {
+    alert("Please enable location services or search for a location.");
+    return;
+  }
+
+  const desiredDistance = parseFloat(document.getElementById("length").value) * 1000; // Convert km to meters
+
+  clearPath(); // Clear any existing path
+
+  service.nearbySearch(
+    {
+      location,
+      radius: 5000,
+      keyword: "jardin",
+    },
+    (results, status) => {
+      if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
+        const waypoints = results
+          .map((place) => ({
+            location: place.geometry.location,
+            stopover: true,
+          }))
+          .slice(0, 5); // Limit waypoints to 5 to avoid exceeding the desired distance
+
+        calculateRoute(location, waypoints, desiredDistance);
+      } else {
+        console.log("No green areas found nearby. Generating a path based on distance only.");
+        calculateRoute(location, [], desiredDistance); // Generate path without waypoints
+      }
     }
-  
-    const desiredDistance = parseFloat(document.getElementById("length").value) * 1000; // Convert km to meters
-  
-    clearPath(); // Clear any existing path
-  
-    service.nearbySearch(
-      {
-        location,
-        radius: 5000,
-        keyword: "jardin",
-      },
-      (results, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
-          const waypoints = results
-            .map((place) => ({
-              location: {
-                lat: place.geometry.location.lat(),
-                lng: place.geometry.location.lng(),
-              },
-              stopover: true,
-            }))
-            .slice(0, 5); // Limit waypoints to 5 to avoid exceeding the desired distance
-  
-          calculateRoute(location, waypoints, desiredDistance);
-        } else {
-          console.log("No green areas found nearby. Generating a path based on distance only.");
-          calculateRoute(location, [], desiredDistance); // Generate path without waypoints
-        }
-      }
-    );
-  }
-  
-  
+  );
+}
 
-  function calculateRoute(origin, waypoints, desiredDistance) {
-    // Validate waypoints before making the route request
-    waypoints = waypoints.map((wp) => ({
-      location: {
-        lat: parseFloat(wp.location.lat),
-        lng: parseFloat(wp.location.lng),
-      },
-      stopover: wp.stopover,
-    }));
-  
-    directionsService.route(
-      {
-        origin: origin,
-        destination: origin, // Loop back to the starting point
-        waypoints: waypoints,
-        travelMode: google.maps.TravelMode.WALKING,
-        optimizeWaypoints: true,
-      },
-      (response, status) => {
-        if (status === google.maps.DirectionsStatus.OK) {
-          const route = response.routes[0];
-          const routeDistance = calculateRouteDistance(route);
-  
-          console.log(`Desired distance: ${desiredDistance}m, Route distance: ${routeDistance}m`);
-  
-          if (Math.abs(routeDistance - desiredDistance) <= 500) {
-            directionsRenderer.setDirections(response);
-          } else {
-            console.log(
-              `Route distance (${routeDistance}m) does not match desired distance (${desiredDistance}m). Retrying.`
-            );
-            adjustRouteToMatchDistance(origin, desiredDistance);
-          }
-        } else {
-          alert("Directions request failed due to " + status);
-        }
-      }
-    );
-  }
-  
-  
-  
-  
+function calculateRoute(origin, waypoints, desiredDistance) {
+  directionsService.route(
+    {
+      origin: origin,
+      destination: origin, // Loop back to the starting point
+      waypoints: waypoints,
+      travelMode: google.maps.TravelMode.WALKING,
+      optimizeWaypoints: true,
+    },
+    (response, status) => {
+      if (status === google.maps.DirectionsStatus.OK) {
+        const route = response.routes[0];
+        const routeDistance = calculateRouteDistance(route);
 
-  function adjustRouteToMatchDistance(origin, desiredDistance) {
-    const loopLeg = desiredDistance / 4;
-    const offset = loopLeg / 100000;
-  
-    const waypoints = [
-      { location: { lat: origin.lat + offset, lng: origin.lng }, stopover: true },
-      { location: { lat: origin.lat, lng: origin.lng + offset }, stopover: true },
-      { location: { lat: origin.lat - offset, lng: origin.lng }, stopover: true },
-      { location: { lat: origin.lat, lng: origin.lng - offset }, stopover: true },
-    ];
-  
-    directionsService.route(
-      {
-        origin: origin,
-        destination: origin,
-        waypoints: waypoints,
-        travelMode: google.maps.TravelMode.WALKING,
-      },
-      (response, status) => {
-        if (status === google.maps.DirectionsStatus.OK) {
+        console.log(`Desired distance: ${desiredDistance}m, Route distance: ${routeDistance}m`);
+
+        if (Math.abs(routeDistance - desiredDistance) <= 500) {
           directionsRenderer.setDirections(response);
         } else {
-          alert("Unable to create a path matching the desired distance.");
+          console.log(
+            `Route distance (${routeDistance}m) does not match desired distance (${desiredDistance}m). Retrying.`
+          );
+          adjustRouteToMatchDistance(origin, desiredDistance);
         }
+      } else {
+        alert("Directions request failed due to " + status);
       }
-    );
-  }
-  
-  
-  
-  
+    }
+  );
+}
 
 function calculateRouteDistance(route) {
   let totalDistance = 0;
@@ -274,4 +224,32 @@ function calculateRouteDistance(route) {
   });
 
   return totalDistance;
+}
+
+function adjustRouteToMatchDistance(origin, desiredDistance) {
+  const loopLeg = desiredDistance / 4;
+  const offset = loopLeg / 100000;
+
+  const waypoints = [
+    { location: { lat: origin.lat + offset, lng: origin.lng }, stopover: true },
+    { location: { lat: origin.lat, lng: origin.lng + offset }, stopover: true },
+    { location: { lat: origin.lat - offset, lng: origin.lng }, stopover: true },
+    { location: { lat: origin.lat, lng: origin.lng - offset }, stopover: true },
+  ];
+
+  directionsService.route(
+    {
+      origin: origin,
+      destination: origin,
+      waypoints: waypoints,
+      travelMode: google.maps.TravelMode.WALKING,
+    },
+    (response, status) => {
+      if (status === google.maps.DirectionsStatus.OK) {
+        directionsRenderer.setDirections(response);
+      } else {
+        alert("Unable to create a path matching the desired distance.");
+      }
+    }
+  );
 }
